@@ -14,35 +14,25 @@ app.get('/',(req,res)=>{
 })
 
 app.get('/search',async (req,res)=>{
-	let result;
-	if(req.query.bloodGroup == 1){
-		result = await getByBloodGrp("AB+");
-	}else if(req.query.bloodGroup == 2){
-		result = await getByBloodGrp("AB-");
-	}else if(req.query.bloodGroup == 3){
-		result = await getByBloodGrp("O+");
-	}else if(req.query.bloodGroup == 4){
-		result = await getByBloodGrp("O-");
-	}else if(req.query.bloodGroup == 5){
-		result = await getByBloodGrp("B+");
-	}else if(req.query.bloodGroup == 6){
-		result = await getByBloodGrp("B-");
-	}else if(req.query.bloodGroup == 7){
-		result = await getByBloodGrp("A+");
-	}else if(req.query.bloodGroup == 8){
-		result = await getByBloodGrp("A-");
-	}
+	let result = [];
+	result = await searchuser(req.query);
+	console.log(result);
 	res.send(result);
 })
 
-app.post('/add',(req,res)=>{
-	console.log("in app.js: ",req.body);
-	adddonar(req.body);
-	res.send("status:200");
+app.post('/add',async (req,res)=>{
+	let auth = await authenticate(req.body.email,req.body.mobile);
+	console.log(auth);
+	if(auth.status == 404){
+		res.send(auth);
+	}else{
+		let statusCheck = await adddonar(req.body);
+		res.send(statusCheck);
+	}
 })
 
 app.get('/states',(req,res)=>{
 	res.sendFile(__dirname+'/states.json');
 })
 
-app.listen(process.env.PORT || 8000);
+app.listen(process.env.PORT || 5000);
